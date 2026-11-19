@@ -1,0 +1,6 @@
+{
+  "name": "Fiction Hike",
+  "description": "Overlay legendary fictional treks onto live GPS maps with 3D topographic terrain, offline map downloads, journey logs, and community leaderboards.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

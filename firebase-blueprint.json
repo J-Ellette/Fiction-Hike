@@ -1,0 +1,128 @@
+{
+  "entities": {
+    "TrekkerProfile": {
+      "title": "TrekkerProfile",
+      "description": "Authenticated trekker profile and cumulative progression summary",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "displayName": { "type": "string" },
+        "favoriteUniverse": { "type": "string" },
+        "totalDistanceKm": { "type": "number" },
+        "treksCompleted": { "type": "integer" },
+        "loreDropsFound": { "type": "integer" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp set via FieldValue.serverTimestamp()" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp set via FieldValue.serverTimestamp()" }
+      },
+      "required": ["userId", "displayName", "favoriteUniverse", "totalDistanceKm", "treksCompleted", "loreDropsFound", "createdAt", "updatedAt"]
+    },
+    "ActiveTrekProgress": {
+      "title": "ActiveTrekProgress",
+      "description": "Per-user progress along a selected fictional trek and character route",
+      "type": "object",
+      "properties": {
+        "trekId": { "type": "string" },
+        "trekTitle": { "type": "string" },
+        "universe": { "type": "string" },
+        "characterName": { "type": "string" },
+        "status": { "type": "string", "enum": ["active", "completed"] },
+        "distanceCoveredKm": { "type": "number" },
+        "targetDistanceKm": { "type": "number" },
+        "currentWaypointIndex": { "type": "integer" },
+        "unlockedLoreDropIds": { "type": "array" },
+        "anchorLat": { "type": "number" },
+        "anchorLon": { "type": "number" },
+        "scaleKm": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp set via FieldValue.serverTimestamp()" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp set via FieldValue.serverTimestamp()" }
+      },
+      "required": ["trekId", "trekTitle", "universe", "characterName", "status", "distanceCoveredKm", "targetDistanceKm", "currentWaypointIndex", "unlockedLoreDropIds", "anchorLat", "anchorLon", "scaleKm", "createdAt", "updatedAt"]
+    },
+    "CommunityTrek": {
+      "title": "CommunityTrek",
+      "description": "User-generated fictional trek with plotted waypoints and custom Lore Drops",
+      "type": "object",
+      "properties": {
+        "creatorId": { "type": "string" },
+        "creatorName": { "type": "string" },
+        "title": { "type": "string" },
+        "universe": { "type": "string" },
+        "characterName": { "type": "string" },
+        "description": { "type": "string" },
+        "difficulty": { "type": "string", "enum": ["EASY", "MODERATE", "EPIC", "LEGENDARY"] },
+        "estimatedKm": { "type": "number" },
+        "elevationGainM": { "type": "integer" },
+        "accentColorHex": { "type": "string" },
+        "published": { "type": "boolean" },
+        "waypoints": { "type": "array" },
+        "loreDrops": { "type": "array" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp set via FieldValue.serverTimestamp()" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp set via FieldValue.serverTimestamp()" }
+      },
+      "required": ["creatorId", "creatorName", "title", "universe", "characterName", "description", "difficulty", "estimatedKm", "elevationGainM", "accentColorHex", "published", "waypoints", "loreDrops", "createdAt", "updatedAt"]
+    },
+    "JourneyLog": {
+      "title": "JourneyLog",
+      "description": "Community-shareable expedition log entry from a fictional hike",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "authorName": { "type": "string" },
+        "trekId": { "type": "string" },
+        "trekTitle": { "type": "string" },
+        "universe": { "type": "string" },
+        "characterName": { "type": "string" },
+        "distanceKm": { "type": "number" },
+        "elevationGainM": { "type": "integer" },
+        "loreDropsUnlocked": { "type": "integer" },
+        "note": { "type": "string" },
+        "moodTag": { "type": "string" },
+        "published": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp set via FieldValue.serverTimestamp()" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp set via FieldValue.serverTimestamp()" }
+      },
+      "required": ["userId", "authorName", "trekId", "trekTitle", "universe", "characterName", "distanceKm", "elevationGainM", "loreDropsUnlocked", "note", "moodTag", "published", "createdAt", "updatedAt"]
+    },
+    "LeaderboardEntry": {
+      "title": "LeaderboardEntry",
+      "description": "Real-time community activity leaderboard entry",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "displayName": { "type": "string" },
+        "rankTitle": { "type": "string" },
+        "activeTrekTitle": { "type": "string" },
+        "activeCharacter": { "type": "string" },
+        "totalDistanceKm": { "type": "number" },
+        "treksCompleted": { "type": "integer" },
+        "loreDropsFound": { "type": "integer" },
+        "activeOnBoard": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp set via FieldValue.serverTimestamp()" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp set via FieldValue.serverTimestamp()" }
+      },
+      "required": ["userId", "displayName", "rankTitle", "activeTrekTitle", "activeCharacter", "totalDistanceKm", "treksCompleted", "loreDropsFound", "activeOnBoard", "createdAt", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/TrekkerProfile" },
+      "description": "Private trekker profile document"
+    },
+    "/users/{userId}/active_progress/{trekId}": {
+      "schema": { "$ref": "#/entities/ActiveTrekProgress" },
+      "description": "User progress records per fictional trek and character"
+    },
+    "/community_treks/{trekId}": {
+      "schema": { "$ref": "#/entities/CommunityTrek" },
+      "description": "Community-shared custom fictional treks"
+    },
+    "/journey_logs/{logId}": {
+      "schema": { "$ref": "#/entities/JourneyLog" },
+      "description": "Trekker expedition journey logs shared with the community"
+    },
+    "/leaderboard_entries/{userId}": {
+      "schema": { "$ref": "#/entities/LeaderboardEntry" },
+      "description": "Real-time community activity leaderboard entries"
+    }
+  }
+}

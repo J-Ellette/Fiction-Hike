@@ -1,0 +1,218 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidTimestamp(ts) {
+      return ts is timestamp && ts <= request.time;
+    }
+
+    function isValidTrekkerProfile(data) {
+      return data.userId is string && data.userId == request.auth.uid &&
+             data.displayName is string && data.displayName.size() >= 1 && data.displayName.size() <= 50 &&
+             data.favoriteUniverse is string && data.favoriteUniverse.size() >= 1 && data.favoriteUniverse.size() <= 50 &&
+             (data.totalDistanceKm is int || data.totalDistanceKm is float) && data.totalDistanceKm >= 0 && data.totalDistanceKm <= 100000 &&
+             data.treksCompleted is int && data.treksCompleted >= 0 && data.treksCompleted <= 5000 &&
+             data.loreDropsFound is int && data.loreDropsFound >= 0 && data.loreDropsFound <= 10000 &&
+             isValidTimestamp(data.createdAt) &&
+             isValidTimestamp(data.updatedAt);
+    }
+
+    function isValidActiveProgress(data) {
+      return data.trekId is string && data.trekId.size() >= 1 && data.trekId.size() <= 128 &&
+             data.trekTitle is string && data.trekTitle.size() >= 1 && data.trekTitle.size() <= 80 &&
+             data.universe is string && data.universe.size() >= 1 && data.universe.size() <= 50 &&
+             data.characterName is string && data.characterName.size() >= 1 && data.characterName.size() <= 50 &&
+             data.status in ['active', 'completed'] &&
+             (data.distanceCoveredKm is int || data.distanceCoveredKm is float) && data.distanceCoveredKm >= 0 && data.distanceCoveredKm <= 5000 &&
+             (data.targetDistanceKm is int || data.targetDistanceKm is float) && data.targetDistanceKm > 0 && data.targetDistanceKm <= 5000 &&
+             data.currentWaypointIndex is int && data.currentWaypointIndex >= 0 && data.currentWaypointIndex <= 100 &&
+             data.unlockedLoreDropIds is list && data.unlockedLoreDropIds.size() <= 50 &&
+             (data.unlockedLoreDropIds.size() == 0 || data.unlockedLoreDropIds[0] is string) &&
+             (data.anchorLat is int || data.anchorLat is float) && data.anchorLat >= -90 && data.anchorLat <= 90 &&
+             (data.anchorLon is int || data.anchorLon is float) && data.anchorLon >= -180 && data.anchorLon <= 180 &&
+             (data.scaleKm is int || data.scaleKm is float) && data.scaleKm >= 0.1 && data.scaleKm <= 5000 &&
+             isValidTimestamp(data.createdAt) &&
+             isValidTimestamp(data.updatedAt);
+    }
+
+    function isValidCommunityTrek(data) {
+      return data.creatorId is string && data.creatorId == request.auth.uid &&
+             data.creatorName is string && data.creatorName.size() >= 1 && data.creatorName.size() <= 50 &&
+             data.title is string && data.title.size() >= 2 && data.title.size() <= 80 &&
+             data.universe is string && data.universe.size() >= 2 && data.universe.size() <= 50 &&
+             data.characterName is string && data.characterName.size() >= 2 && data.characterName.size() <= 50 &&
+             data.description is string && data.description.size() <= 500 &&
+             data.difficulty in ['EASY', 'MODERATE', 'EPIC', 'LEGENDARY'] &&
+             (data.estimatedKm is int || data.estimatedKm is float) && data.estimatedKm >= 0.1 && data.estimatedKm <= 5000 &&
+             data.elevationGainM is int && data.elevationGainM >= 0 && data.elevationGainM <= 50000 &&
+             data.accentColorHex is string && data.accentColorHex.size() >= 4 && data.accentColorHex.size() <= 9 &&
+             data.published is bool &&
+             data.waypoints is list && data.waypoints.size() >= 2 && data.waypoints.size() <= 60 &&
+             data.waypoints[0] is map &&
+             data.loreDrops is list && data.loreDrops.size() <= 20 &&
+             (data.loreDrops.size() == 0 || data.loreDrops[0] is map) &&
+             isValidTimestamp(data.createdAt) &&
+             isValidTimestamp(data.updatedAt);
+    }
+
+    function isValidJourneyLog(data) {
+      return data.userId is string && data.userId == request.auth.uid &&
+             data.authorName is string && data.authorName.size() >= 1 && data.authorName.size() <= 50 &&
+             data.trekId is string && data.trekId.size() >= 1 && data.trekId.size() <= 128 &&
+             data.trekTitle is string && data.trekTitle.size() >= 1 && data.trekTitle.size() <= 80 &&
+             data.universe is string && data.universe.size() >= 1 && data.universe.size() <= 50 &&
+             data.characterName is string && data.characterName.size() >= 1 && data.characterName.size() <= 50 &&
+             (data.distanceKm is int || data.distanceKm is float) && data.distanceKm >= 0 && data.distanceKm <= 5000 &&
+             data.elevationGainM is int && data.elevationGainM >= 0 && data.elevationGainM <= 50000 &&
+             data.loreDropsUnlocked is int && data.loreDropsUnlocked >= 0 && data.loreDropsUnlocked <= 50 &&
+             data.note is string && data.note.size() >= 1 && data.note.size() <= 600 &&
+             data.moodTag is string && data.moodTag.size() >= 1 && data.moodTag.size() <= 30 &&
+             data.published is bool &&
+             isValidTimestamp(data.createdAt) &&
+             isValidTimestamp(data.updatedAt);
+    }
+
+    function isValidLeaderboardEntry(data) {
+      return data.userId is string && data.userId == request.auth.uid &&
+             data.displayName is string && data.displayName.size() >= 1 && data.displayName.size() <= 50 &&
+             data.rankTitle is string && data.rankTitle.size() >= 1 && data.rankTitle.size() <= 40 &&
+             data.activeTrekTitle is string && data.activeTrekTitle.size() <= 80 &&
+             data.activeCharacter is string && data.activeCharacter.size() <= 50 &&
+             (data.totalDistanceKm is int || data.totalDistanceKm is float) && data.totalDistanceKm >= 0 && data.totalDistanceKm <= 100000 &&
+             data.treksCompleted is int && data.treksCompleted >= 0 && data.treksCompleted <= 5000 &&
+             data.loreDropsFound is int && data.loreDropsFound >= 0 && data.loreDropsFound <= 10000 &&
+             data.activeOnBoard is bool &&
+             isValidTimestamp(data.createdAt) &&
+             isValidTimestamp(data.updatedAt);
+    }
+
+    match /users/{userId} {
+      allow get: if isOwner(userId) && isValidId(userId);
+      allow list: if false;
+
+      allow create: if isOwner(userId) &&
+                       isValidId(userId) &&
+                       incoming().keys().hasAll(['userId', 'displayName', 'favoriteUniverse', 'totalDistanceKm', 'treksCompleted', 'loreDropsFound', 'createdAt', 'updatedAt']) &&
+                       incoming().keys().hasOnly(['userId', 'displayName', 'favoriteUniverse', 'totalDistanceKm', 'treksCompleted', 'loreDropsFound', 'createdAt', 'updatedAt']) &&
+                       isValidTrekkerProfile(incoming());
+
+      allow update: if isOwner(userId) &&
+                       isValidId(userId) &&
+                       incoming().userId == existing().userId &&
+                       incoming().createdAt == existing().createdAt &&
+                       isValidTrekkerProfile(incoming()) &&
+                       incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'favoriteUniverse', 'totalDistanceKm', 'treksCompleted', 'loreDropsFound', 'updatedAt']);
+
+      allow delete: if isOwner(userId) && isValidId(userId);
+
+      match /active_progress/{trekId} {
+        allow get: if isOwner(userId) && isValidId(userId) && isValidId(trekId);
+        allow list: if isOwner(userId) && isValidId(userId);
+
+        allow create: if isOwner(userId) &&
+                         isValidId(userId) &&
+                         isValidId(trekId) &&
+                         incoming().keys().hasAll(['trekId', 'trekTitle', 'universe', 'characterName', 'status', 'distanceCoveredKm', 'targetDistanceKm', 'currentWaypointIndex', 'unlockedLoreDropIds', 'anchorLat', 'anchorLon', 'scaleKm', 'createdAt', 'updatedAt']) &&
+                         incoming().keys().hasOnly(['trekId', 'trekTitle', 'universe', 'characterName', 'status', 'distanceCoveredKm', 'targetDistanceKm', 'currentWaypointIndex', 'unlockedLoreDropIds', 'anchorLat', 'anchorLon', 'scaleKm', 'createdAt', 'updatedAt']) &&
+                         isValidActiveProgress(incoming());
+
+        allow update: if isOwner(userId) &&
+                         isValidId(userId) &&
+                         isValidId(trekId) &&
+                         incoming().trekId == existing().trekId &&
+                         incoming().createdAt == existing().createdAt &&
+                         isValidActiveProgress(incoming()) &&
+                         incoming().diff(existing()).affectedKeys().hasOnly(['trekTitle', 'universe', 'characterName', 'status', 'distanceCoveredKm', 'targetDistanceKm', 'currentWaypointIndex', 'unlockedLoreDropIds', 'anchorLat', 'anchorLon', 'scaleKm', 'updatedAt']);
+
+        allow delete: if isOwner(userId) && isValidId(userId) && isValidId(trekId);
+      }
+    }
+
+    match /community_treks/{trekId} {
+      allow get: if isSignedIn() && isValidId(trekId) && (existing().published == true || existing().creatorId == request.auth.uid);
+      allow list: if isSignedIn() && (resource.data.published == true || resource.data.creatorId == request.auth.uid);
+
+      allow create: if isSignedIn() &&
+                       isValidId(trekId) &&
+                       incoming().keys().hasAll(['creatorId', 'creatorName', 'title', 'universe', 'characterName', 'description', 'difficulty', 'estimatedKm', 'elevationGainM', 'accentColorHex', 'published', 'waypoints', 'loreDrops', 'createdAt', 'updatedAt']) &&
+                       incoming().keys().hasOnly(['creatorId', 'creatorName', 'title', 'universe', 'characterName', 'description', 'difficulty', 'estimatedKm', 'elevationGainM', 'accentColorHex', 'published', 'waypoints', 'loreDrops', 'createdAt', 'updatedAt']) &&
+                       isValidCommunityTrek(incoming());
+
+      allow update: if isSignedIn() &&
+                       isValidId(trekId) &&
+                       existing().creatorId == request.auth.uid &&
+                       incoming().creatorId == existing().creatorId &&
+                       incoming().createdAt == existing().createdAt &&
+                       isValidCommunityTrek(incoming()) &&
+                       incoming().diff(existing()).affectedKeys().hasOnly(['creatorName', 'title', 'universe', 'characterName', 'description', 'difficulty', 'estimatedKm', 'elevationGainM', 'accentColorHex', 'published', 'waypoints', 'loreDrops', 'updatedAt']);
+
+      allow delete: if isSignedIn() && isValidId(trekId) && existing().creatorId == request.auth.uid;
+    }
+
+    match /journey_logs/{logId} {
+      allow get: if isSignedIn() && isValidId(logId) && (existing().published == true || existing().userId == request.auth.uid);
+      allow list: if isSignedIn() && (resource.data.published == true || resource.data.userId == request.auth.uid);
+
+      allow create: if isSignedIn() &&
+                       isValidId(logId) &&
+                       incoming().keys().hasAll(['userId', 'authorName', 'trekId', 'trekTitle', 'universe', 'characterName', 'distanceKm', 'elevationGainM', 'loreDropsUnlocked', 'note', 'moodTag', 'published', 'createdAt', 'updatedAt']) &&
+                       incoming().keys().hasOnly(['userId', 'authorName', 'trekId', 'trekTitle', 'universe', 'characterName', 'distanceKm', 'elevationGainM', 'loreDropsUnlocked', 'note', 'moodTag', 'published', 'createdAt', 'updatedAt']) &&
+                       isValidJourneyLog(incoming());
+
+      allow update: if isSignedIn() &&
+                       isValidId(logId) &&
+                       existing().userId == request.auth.uid &&
+                       incoming().userId == existing().userId &&
+                       incoming().createdAt == existing().createdAt &&
+                       isValidJourneyLog(incoming()) &&
+                       incoming().diff(existing()).affectedKeys().hasOnly(['authorName', 'note', 'moodTag', 'published', 'distanceKm', 'elevationGainM', 'loreDropsUnlocked', 'updatedAt']);
+
+      allow delete: if isSignedIn() && isValidId(logId) && existing().userId == request.auth.uid;
+    }
+
+    match /leaderboard_entries/{userId} {
+      allow get: if isSignedIn() && isValidId(userId) && (existing().activeOnBoard == true || request.auth.uid == userId);
+      allow list: if isSignedIn() && resource.data.activeOnBoard == true;
+
+      allow create: if isOwner(userId) &&
+                       isValidId(userId) &&
+                       incoming().keys().hasAll(['userId', 'displayName', 'rankTitle', 'activeTrekTitle', 'activeCharacter', 'totalDistanceKm', 'treksCompleted', 'loreDropsFound', 'activeOnBoard', 'createdAt', 'updatedAt']) &&
+                       incoming().keys().hasOnly(['userId', 'displayName', 'rankTitle', 'activeTrekTitle', 'activeCharacter', 'totalDistanceKm', 'treksCompleted', 'loreDropsFound', 'activeOnBoard', 'createdAt', 'updatedAt']) &&
+                       isValidLeaderboardEntry(incoming());
+
+      allow update: if isOwner(userId) &&
+                       isValidId(userId) &&
+                       incoming().userId == existing().userId &&
+                       incoming().createdAt == existing().createdAt &&
+                       isValidLeaderboardEntry(incoming()) &&
+                       incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'rankTitle', 'activeTrekTitle', 'activeCharacter', 'totalDistanceKm', 'treksCompleted', 'loreDropsFound', 'activeOnBoard', 'updatedAt']);
+
+      allow delete: if isOwner(userId) && isValidId(userId);
+    }
+  }
+}

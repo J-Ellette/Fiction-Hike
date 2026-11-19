@@ -1,0 +1,31 @@
+package com.example.ui.theme
+
+import androidx.compose.ui.graphics.Color
+
+// Night Cartographer (Dark Palette)
+val ObsidianForest = Color(0xFF0C1411)
+val DeepPine = Color(0xFF13201B)
+val SlateTimber = Color(0xFF1B2C25)
+val MossSurface = Color(0xFF233830)
+val IlluminatedBrass = Color(0xFFE8B84B)
+val WarmGoldContainer = Color(0xFF3E2F11)
+val TrailEmerald = Color(0xFF3DD598)
+val DeepEmeraldContainer = Color(0xFF0F3828)
+val TorchlightAmber = Color(0xFFF48C42)
+val CrimsonBeacon = Color(0xFFEF6461)
+val ParchmentWhite = Color(0xFFF2EDE2)
+val MutedSage = Color(0xFFA7B8AF)
+val OutlineNight = Color(0xFF31473E)
+
+// Parchment Survey (Light Palette)
+val WarmVellum = Color(0xFFF7F3EA)
+val AgedParchment = Color(0xFFEDE5D4)
+val SandCard = Color(0xFFE4DAC4)
+val ForestInk = Color(0xFF172B22)
+val DeepMoss = Color(0xFF1E5E45)
+val LightEmeraldContainer = Color(0xFFCDEEE0)
+val BurnishedBronze = Color(0xFF9C6615)
+val LightGoldContainer = Color(0xFFF7E4BC)
+val EmberRust = Color(0xFFB84A24)
+val MutedSlateInk = Color(0xFF4B6056)
+val OutlineParchment = Color(0xFFC8BCA4)
